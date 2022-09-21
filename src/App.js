@@ -19,6 +19,8 @@ import SidebarHeading from './components/SidebarHeading.js';
 import SidebarList from './components/SidebarList.js';
 import Statusbar from './components/Statusbar.js';
 
+
+
 class App extends React.Component {
     constructor(props) {
         super(props);
@@ -235,6 +237,22 @@ class App extends React.Component {
         let transaction = new MoveSong_Transaction(this, start, end);
         this.tps.addTransaction(transaction);
     }
+
+    // A-DELETESONG
+    deleteSong = (event, num) => {
+        this.state.currentList.songs.splice(num-1, 1);
+
+        this.setState(prevState => ({
+            listKeyPairMarkedForDeletion : prevState.listKeyPairMarkedForDeletion,
+            currentList : this.state.currentList,
+            sessionData : this.state.sessionData
+        }), () => {
+            // UPDATING THE LIST IN PERMANENT STORAGE
+            // IS AN AFTER EFFECT
+            this.db.mutationUpdateList(this.state.currentList);
+        });
+        
+    }
     // THIS FUNCTION BEGINS THE PROCESS OF PERFORMING AN UNDO
     undo = () => {
         if (this.tps.hasTransactionToUndo()) {
@@ -303,7 +321,8 @@ class App extends React.Component {
                 />
                 <PlaylistCards
                     currentList={this.state.currentList}
-                    moveSongCallback={this.addMoveSongTransaction} />
+                    moveSongCallback={this.addMoveSongTransaction}
+                    deleteSongCallback={this.deleteSong} />
                 <Statusbar 
                     currentList={this.state.currentList} />
                 <DeleteListModal

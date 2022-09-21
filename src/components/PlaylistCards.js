@@ -2,14 +2,20 @@ import SongCard from './SongCard.js';
 import React from "react";
 
 export default class PlaylistCards extends React.Component {
+    
+
+
     render() {
         const { currentList, 
-                moveSongCallback } = this.props;
+            moveSongCallback,
+            deleteSongCallback } = this.props;
+                
         if (currentList === null) {
             return (
                 <div id="playlist-cards"></div>
             )
         }
+        
         else {
             return (
                 <div id="playlist-cards">
@@ -20,6 +26,7 @@ export default class PlaylistCards extends React.Component {
                                 key={'playlist-song-' + (index+1)}
                                 song={song}
                                 moveCallback={moveSongCallback}
+                                deleteCallback={deleteSongCallback}
                             />
                         ))
                     }

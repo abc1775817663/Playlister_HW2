@@ -48,6 +48,7 @@ export default class ListCard extends React.Component {
         this.props.renameListCallback(key, textValue);
         this.handleToggleEdit();
     }
+    
 
     render() {
         const { keyNamePair, selected } = this.props;
@@ -87,7 +88,7 @@ export default class ListCard extends React.Component {
                         id={"delete-list-" + keyNamePair.key}
                         className="list-card-button"
                         onClick={this.handleDeleteList}
-                        value={"\u2715"} />
+                        value="&#128465;" />
                 </div>
             );
         }
