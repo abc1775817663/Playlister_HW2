@@ -96,7 +96,7 @@ export default class SongCard extends React.Component {
                     type="button"
                     id={"delete-song-" + num}
                     className="song-card-button"
-                    onClick={(event) => this.props.deleteCallback(event, num)}
+                    onClick={() => this.props.deleteCallback(num)}
                     value="&#10005;" />
                 
             </div>
