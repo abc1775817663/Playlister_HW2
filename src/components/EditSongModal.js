@@ -16,31 +16,28 @@ export default class EditSongModal extends Component {
     }
 
     handleChangeTitle = (e) => {
-        this.state.titleChange = e.target.value;
         this.setState({
             song: this.state.song,
-            titleChange: this.state.titleChange,
+            titleChange: e.target.value,
             artistChange: this.state.artistChange,
-            linkChange: this.linkChange
+            linkChange: this.state.linkChange
         })
         
     }
     handleChangeArtist= (e) => {
-        this.state.artistChange = e.target.value;
         this.setState({
             song: this.state.song,
             titleChange: this.state.titleChange,
-            artistChange: this.state.artistChange,
-            linkChange: this.linkChange
+            artistChange: e.target.value,
+            linkChange: this.staetelinkChange
         })
     }
     handleChangeLink= (e) => {
-        this.state.linkChange = e.target.value;
         this.setState({
             song: this.state.song,
             titleChange: this.state.titleChange,
             artistChange: this.state.artistChange,
-            linkChange: this.linkChange
+            linkChange: e.target.value
         })
     }
 
