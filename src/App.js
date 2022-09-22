@@ -45,13 +45,19 @@ class App extends React.Component {
             currentList : null,
             sessionData : loadedSessionData
         }
-        this.addReDoAndUnDoShortCut();
+        
     }
     addReDoAndUnDoShortCut(){
-        function KeyPress(e, app) {
-            var evtobj = window.event? window.event : e
-            if (evtobj.keyCode == 89 && evtobj.ctrlKey) app.redo();
-            if (evtobj.keyCode == 90 && evtobj.ctrlKey) app.undo();
+        function KeyPress(evtobj, app) {
+            
+            if (evtobj.key == "z" && evtobj.ctrlKey){
+                 app.undo();
+                 app.setStateWithUpdatedList(app.state.currentList);
+            }
+            if (evtobj.key == "y" && evtobj.ctrlKey){
+                app.redo();
+                app.setStateWithUpdatedList(app.state.currentList);
+            } 
         }
         
         document.onkeydown = (e) => KeyPress(e,this);
@@ -324,6 +330,7 @@ class App extends React.Component {
 
             // MAKE SURE THE LIST GETS PERMANENTLY UPDATED
             this.db.mutationUpdateList(this.state.currentList);
+            
         }
     }
     // THIS FUNCTION BEGINS THE PROCESS OF PERFORMING A REDO
@@ -409,10 +416,14 @@ class App extends React.Component {
 
 
     render() {
+        this.addReDoAndUnDoShortCut();
+
         let canAddSong = this.state.currentList !== null;
         let canUndo = this.tps.hasTransactionToUndo();
         let canRedo = this.tps.hasTransactionToRedo();
         let canClose = this.state.currentList !== null;
+        let canAddList = this.state.currentList == null;
+
 
 
         return (
@@ -420,6 +431,7 @@ class App extends React.Component {
                 <Banner />
                 <SidebarHeading
                     createNewListCallback={this.createNewList}
+                    canAddList={canAddList}
                 />
                 <SidebarList
                     currentList={this.state.currentList}
@@ -427,6 +439,7 @@ class App extends React.Component {
                     deleteListCallback={this.markListForDeletion}
                     loadListCallback={this.loadList}
                     renameListCallback={this.renameList}
+                
                 />
                 <EditToolbar
                     canAddSong={canAddSong}
