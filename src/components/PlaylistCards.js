@@ -6,10 +6,12 @@ export default class PlaylistCards extends React.Component {
 
 
     render() {
+
         const { currentList, 
             moveSongCallback,
             deleteSongCallback,
             editSongCallback } = this.props;
+
                 
         if (currentList === null) {
             return (
@@ -29,6 +31,7 @@ export default class PlaylistCards extends React.Component {
                                 moveCallback={moveSongCallback}
                                 deleteCallback={deleteSongCallback}
                                 editSongCallback={editSongCallback}
+                                
                             />
                         ))
                     }

@@ -7,6 +7,9 @@ import jsTPS from './common/jsTPS.js';
 
 // OUR TRANSACTIONS
 import MoveSong_Transaction from './transactions/MoveSong_Transaction.js';
+import EditSong_Transaction from './transactions/EditSong_Transaction';
+import DeleteSong_Transaction from './transactions/DeleteSong_Transaction';
+import AddSong_Transaction from './transactions/AddSong_Transaction';
 
 // THESE REACT COMPONENTS ARE MODALS
 import DeleteListModal from './components/DeleteListModal.js';
@@ -20,7 +23,6 @@ import SidebarList from './components/SidebarList.js';
 import Statusbar from './components/Statusbar.js';
 import DeleteSongModal from './components/DeleteSongModal.js'
 import EditSongModal from './components/EditSongModal';
-
 
 
 class App extends React.Component {
@@ -43,6 +45,16 @@ class App extends React.Component {
             currentList : null,
             sessionData : loadedSessionData
         }
+        this.addReDoAndUnDoShortCut();
+    }
+    addReDoAndUnDoShortCut(){
+        function KeyPress(e, app) {
+            var evtobj = window.event? window.event : e
+            if (evtobj.keyCode == 89 && evtobj.ctrlKey) app.redo();
+            if (evtobj.keyCode == 90 && evtobj.ctrlKey) app.undo();
+        }
+        
+        document.onkeydown = (e) => KeyPress(e,this);
     }
     sortKeyNamePairsByName = (keyNamePairs) => {
         keyNamePairs.sort((keyPair1, keyPair2) => {
@@ -141,23 +153,11 @@ class App extends React.Component {
         this.hideDeleteSongModal();
     }
 
-    editMarkedSong = () => {
-        const {currentList, currentSongNum} = this.state;
-        let title = document.getElementById("edit-song-modal-title-textfield").value;
-        let artist = document.getElementById("edit-song-modal-artist-textfield").value;
-        let youTubeId = document.getElementById("edit-song-modal-youTubeId-textfield").value;
-        currentList.songs[currentSongNum - 1] = {title: title, artist: artist, youTubeId: youTubeId};
+    editMarkedSong = (newInfo, currentSongNum) => {
+        const {currentList} = this.state;
 
-        this.setState(prevState => ({
-            currentSongNum: prevState.currentSongNum,
-            listKeyPairMarkedForDeletion : prevState.listKeyPairMarkedForDeletion,
-            currentList : this.state.currentList,
-            sessionData : this.state.sessionData
-        }), () => {
-            // UPDATING THE LIST IN PERMANENT STORAGE
-            // IS AN AFTER EFFECT
-            this.db.mutationUpdateList(this.state.currentList);
-        });
+        currentList.songs[currentSongNum - 1] = newInfo;
+        this.setStateWithUpdatedList(currentList);
 
         this.hideEditSongModal();
     }
@@ -231,17 +231,10 @@ class App extends React.Component {
     }
 
     addNewSong = () => {
-        this.state.currentList.songs.push({title: "Untitled", artist: "Unknown", youTubeId: "dQw4w9WgXcQ", });
-        this.setState(prevState => ({
-            currentSongNum : prevState.currentSongNum,
-            listKeyPairMarkedForDeletion : prevState.listKeyPairMarkedForDeletion,
-            currentList: prevState.currentList,
-            sessionData: this.state.sessionData
-        }), () => {
-            // UPDATING THE LIST IN PERMANENT STORAGE
-            // IS AN AFTER EFFECT
-            this.db.mutationUpdateList(this.state.currentList);
-        });
+        let list = this.state.currentList
+        list.songs.push({title: "Untitled", artist: "Unknown", youTubeId: "dQw4w9WgXcQ" });
+        this.setStateWithUpdatedList(list);
+
     }
     setStateWithUpdatedList(list) {
         this.setState(prevState => ({
@@ -285,6 +278,25 @@ class App extends React.Component {
     // THIS FUNCTION ADDS A MoveSong_Transaction TO THE TRANSACTION STACK
     addMoveSongTransaction = (start, end) => {
         let transaction = new MoveSong_Transaction(this, start, end);
+        this.tps.addTransaction(transaction);
+    }
+    addAddSongTransaction = () => {
+        let transaction = new AddSong_Transaction(this);
+        this.tps.addTransaction(transaction);
+    }
+    addEditSongTransaction = () => {
+        let title = document.getElementById("edit-song-modal-title-textfield").value;
+        let artist = document.getElementById("edit-song-modal-artist-textfield").value;
+        let youTubeId = document.getElementById("edit-song-modal-youTubeId-textfield").value;
+        
+        let newInfo = {title: title, artist: artist, youTubeId: youTubeId};
+
+        let transaction = new EditSong_Transaction(this, newInfo, this.state.currentSongNum);
+        this.tps.addTransaction(transaction);
+    }
+
+    deleteSongTransaction = (num) => {
+        let transaction = new DeleteSong_Transaction(this, num);
         this.tps.addTransaction(transaction);
     }
 
@@ -393,11 +405,16 @@ class App extends React.Component {
         for (var i=0; i<arguments.length; i++)
             console.log(arguments[i]);
     }
+
+
+
     render() {
         let canAddSong = this.state.currentList !== null;
         let canUndo = this.tps.hasTransactionToUndo();
         let canRedo = this.tps.hasTransactionToRedo();
         let canClose = this.state.currentList !== null;
+
+
         return (
             <div id="root">
                 <Banner />
@@ -419,12 +436,12 @@ class App extends React.Component {
                     undoCallback={this.undo}
                     redoCallback={this.redo}
                     closeCallback={this.closeCurrentList}
-                    addCallback={this.addNewSong}
+                    addCallback={this.addAddSongTransaction}
                 />
                 <PlaylistCards
                     currentList={this.state.currentList}
                     moveSongCallback={this.addMoveSongTransaction}
-                    deleteSongCallback={this.markSongForDeletion}
+                    deleteSongCallback={this.deleteSongTransaction}
                     editSongCallback = {this.markSongForEdit} 
                     />
                 <Statusbar 
@@ -449,7 +466,7 @@ class App extends React.Component {
                         this.state.currentList.songs[this.state.currentSongNum - 1] : null) :
                         null
                     }
-                    comfirmEditCallback={this.editMarkedSong}
+                    comfirmEditCallback={this.addEditSongTransaction}
                     hideModalCallback={this.hideEditSongModal}
                 />
 
@@ -458,4 +475,6 @@ class App extends React.Component {
     }
 }
 
+
 export default App;
+

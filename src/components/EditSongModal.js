@@ -61,7 +61,7 @@ export default class EditSongModal extends Component {
             artistChange: null,
             linkChange: null
         })
-        
+
         this.props.comfirmEditCallback();
     }
     
@@ -99,13 +99,13 @@ export default class EditSongModal extends Component {
                             <div class="modal-center-content" id="edit-song-info-div">
 
                                     <span id="title-prompt">Title:</span>
-                                    <input value={titleChange? titleChange : songInfoObj.title} onChange={this.handleChangeTitle} id="edit-song-modal-title-textfield"></input>
+                                    <input value={titleChange != null ? titleChange : songInfoObj.title} onChange={this.handleChangeTitle} id="edit-song-modal-title-textfield"></input>
 
                                     <span id="artist-prompt">Artist:</span>
-                                    <input value={artistChange? artistChange : songInfoObj.artist} onChange={this.handleChangeArtist} id="edit-song-modal-artist-textfield"></input>
+                                    <input value={artistChange != null ? artistChange : songInfoObj.artist} onChange={this.handleChangeArtist} id="edit-song-modal-artist-textfield"></input>
 
                                     <span id="you-tube-id-prompt">YouTubeId:</span>
-                                    <input value={linkChange? linkChange : songInfoObj.youTubeId} onChange={this.handleChangeLink} id="edit-song-modal-youTubeId-textfield"></input>
+                                    <input value={linkChange != null ? linkChange : songInfoObj.youTubeId} onChange={this.handleChangeLink} id="edit-song-modal-youTubeId-textfield"></input>
 
                                 
                             </div>
