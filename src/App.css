@@ -116,7 +116,7 @@ body {
   border-radius: 25px;
 }
 
-.unselected-list-card:hover {
+.unselected-list-card:hover, .playlister-song:hover {
   cursor: pointer;
   background-color: var(--swatch-contrast);
   color:white;
@@ -257,13 +257,23 @@ span {
   font-size: 20pt;
 }
 
+
+#edit-song-info-div {
+  display: grid;
+  grid-template-rows: 1fr 1fr 1fr;
+  grid-template-columns: repeat(3,1fr);
+  grid-gap: 10px;
+
+}
+
 #title-prompt {
   grid-column: 1 / 2;
   grid-row: 1 / 2;
+  
 }
 
 #edit-song-modal-title-textfield {
-  grid-column: 2 / 3;
+  grid-column: 2 / 4;
   grid-row: 1 / 2;
 }
 
@@ -273,7 +283,7 @@ span {
 }
 
 #edit-song-modal-artist-textfield {
-  grid-column: 2 / 3;
+  grid-column: 2 / 4;
   grid-row: 2 / 3;
 }
 
@@ -283,9 +293,11 @@ span {
 }
 
 #edit-song-modal-youTubeId-textfield {
-  grid-column: 2 / 3;
+  grid-column: 2 / 4;
   grid-row: 3 / 4;
+
 }
+
 
 .confirm-cancel-box {
   grid-column: 1 / 3;

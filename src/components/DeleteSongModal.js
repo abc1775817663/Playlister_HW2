@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 
-export default class DeleteListModal extends Component {
+export default class DeleteSongModal extends Component {
     render() {
         const { song, deleteSongCallback, hideDeleteSongModalCallback } = this.props;
         let name = "";
