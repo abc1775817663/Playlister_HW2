@@ -229,6 +229,20 @@ class App extends React.Component {
             this.tps.clearAllTransactions();
         });
     }
+
+    addNewSong = () => {
+        this.state.currentList.songs.push({title: "Untitled", artist: "Unknown", youTubeId: "dQw4w9WgXcQ", });
+        this.setState(prevState => ({
+            currentSongNum : prevState.currentSongNum,
+            listKeyPairMarkedForDeletion : prevState.listKeyPairMarkedForDeletion,
+            currentList: prevState.currentList,
+            sessionData: this.state.sessionData
+        }), () => {
+            // UPDATING THE LIST IN PERMANENT STORAGE
+            // IS AN AFTER EFFECT
+            this.db.mutationUpdateList(this.state.currentList);
+        });
+    }
     setStateWithUpdatedList(list) {
         this.setState(prevState => ({
             currentSongNum: prevState.currentSongNum,
@@ -405,6 +419,7 @@ class App extends React.Component {
                     undoCallback={this.undo}
                     redoCallback={this.redo}
                     closeCallback={this.closeCurrentList}
+                    addCallback={this.addNewSong}
                 />
                 <PlaylistCards
                     currentList={this.state.currentList}
