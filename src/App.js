@@ -50,15 +50,17 @@ class App extends React.Component {
     }
     addReDoAndUnDoShortCut(){
         function KeyPress(evtobj, app) {
+            if (!app.state.modalOpen){
             
-            if (evtobj.key == "z" && evtobj.ctrlKey){
-                 app.undo();
-                 app.setStateWithUpdatedList(app.state.currentList);
+                if (evtobj.key == "z" && evtobj.ctrlKey){
+                    app.undo();
+                    app.setStateWithUpdatedList(app.state.currentList);
+                }
+                if (evtobj.key == "y" && evtobj.ctrlKey){
+                    app.redo();
+                    app.setStateWithUpdatedList(app.state.currentList);
+                } 
             }
-            if (evtobj.key == "y" && evtobj.ctrlKey){
-                app.redo();
-                app.setStateWithUpdatedList(app.state.currentList);
-            } 
         }
         
         document.onkeydown = (e) => KeyPress(e,this);
