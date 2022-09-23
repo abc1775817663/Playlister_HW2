@@ -40,6 +40,7 @@ class App extends React.Component {
 
         // SETUP THE INITIAL STATE
         this.state = {
+            modalOpen: false,
             currentSongNum: null,
             listKeyPairMarkedForDeletion : null,
             currentList : null,
@@ -94,6 +95,7 @@ class App extends React.Component {
         // SO ANY AFTER EFFECTS THAT NEED TO USE THIS UPDATED STATE
         // SHOULD BE DONE VIA ITS CALLBACK
         this.setState(prevState => ({
+            modalOpen: prevState.modalOpen,
             currentSongNum: prevState.currentSongNum,
             listKeyPairMarkedForDeletion : prevState.listKeyPairMarkedForDeletion,
             currentList: newList,
@@ -132,6 +134,7 @@ class App extends React.Component {
 
         // AND FROM OUR APP STATE
         this.setState(prevState => ({
+            modalOpen: prevState.modalOpen,
             currentSongNum: null,
             listKeyPairMarkedForDeletion : null,
             currentList: newCurrentList,
@@ -192,6 +195,7 @@ class App extends React.Component {
         }
 
         this.setState(prevState => ({
+            modalOpen: prevState.modalOpen,
             currentSongNum: null,
             listKeyPairMarkedForDeletion : null,
             sessionData: {
@@ -212,6 +216,7 @@ class App extends React.Component {
     loadList = (key) => {
         let newCurrentList = this.db.queryGetList(key);
         this.setState(prevState => ({
+            modalOpen: prevState.modalOpen,
             currentSongNum: prevState.currentSongNum,
             listKeyPairMarkedForDeletion : prevState.listKeyPairMarkedForDeletion,
             currentList: newCurrentList,
@@ -220,11 +225,13 @@ class App extends React.Component {
             // AN AFTER EFFECT IS THAT WE NEED TO MAKE SURE
             // THE TRANSACTION STACK IS CLEARED
             this.tps.clearAllTransactions();
+            this.setStateWithUpdatedList(this.state.currentList);
         });
     }
     // THIS FUNCTION BEGINS THE PROCESS OF CLOSING THE CURRENT LIST
     closeCurrentList = () => {
         this.setState(prevState => ({
+            modalOpen: prevState.modalOpen,
             currentSongNum : prevState.currentSongNum,
             listKeyPairMarkedForDeletion : prevState.listKeyPairMarkedForDeletion,
             currentList: null,
@@ -244,6 +251,7 @@ class App extends React.Component {
     }
     setStateWithUpdatedList(list) {
         this.setState(prevState => ({
+            modalOpen: prevState.modalOpen,
             currentSongNum: prevState.currentSongNum,
             listKeyPairMarkedForDeletion : prevState.listKeyPairMarkedForDeletion,
             currentList : list,
@@ -253,6 +261,15 @@ class App extends React.Component {
             // IS AN AFTER EFFECT
             this.db.mutationUpdateList(this.state.currentList);
         });
+    }
+    setStateWithUpdatedModalOpen(isModalOpen) {
+        this.setState(prevState => ({
+            modalOpen: isModalOpen,
+            currentSongNum: prevState.currentSongNum,
+            listKeyPairMarkedForDeletion : prevState.listKeyPairMarkedForDeletion,
+            currentList : prevState.currentList,
+            sessionData : this.state.sessionData
+        }));
     }
     getPlaylistSize = () => {
         return this.state.currentList.songs.length;
@@ -312,7 +329,26 @@ class App extends React.Component {
         this.state.currentList.songs.splice(this.state.currentSongNum-1, 1);
 
         this.setState(prevState => ({
+            modalOpen: prevState.modalOpen,
             currentSongNum: prevState.currentSongNum,
+            listKeyPairMarkedForDeletion : prevState.listKeyPairMarkedForDeletion,
+            currentList : this.state.currentList,
+            sessionData : this.state.sessionData
+        }), () => {
+            // UPDATING THE LIST IN PERMANENT STORAGE
+            // IS AN AFTER EFFECT
+            this.db.mutationUpdateList(this.state.currentList);
+        });
+        
+    }
+
+    deleteSongWithIndex = (index) => {
+
+        this.state.currentList.songs.splice(index, 1);
+
+        this.setState(prevState => ({
+            modalOpen: prevState.modalOpen,
+            currentSongNum: index,
             listKeyPairMarkedForDeletion : prevState.listKeyPairMarkedForDeletion,
             currentList : this.state.currentList,
             sessionData : this.state.sessionData
@@ -344,6 +380,7 @@ class App extends React.Component {
     }
     markListForDeletion = (keyPair) => {
         this.setState(prevState => ({
+            modalOpen: prevState.modalOpen,
             currentSongNum: prevState.currentSongNum,
             currentList: prevState.currentList,
             listKeyPairMarkedForDeletion : keyPair,
@@ -368,6 +405,7 @@ class App extends React.Component {
 
     markSongForEdit = (num) => {
         this.setState(prevState => ({
+            modalOpen: prevState.modalOpen,
             currentSongNum: num,
             currentList: prevState.currentList,
             listKeyPairMarkedForDeletion : prevState.listKeyPairMarkedForDeletion,
@@ -379,50 +417,61 @@ class App extends React.Component {
     }
     // THIS FUNCTION SHOWS THE MODAL FOR PROMPTING THE USER
     // TO SEE IF THEY REALLY WANT TO DELETE THE LIST
-    showDeleteListModal() {
+    showDeleteListModal = () => {
         let modal = document.getElementById("delete-list-modal");
         modal.classList.add("is-visible");
+        this.setStateWithUpdatedModalOpen(true);
     }
     // THIS FUNCTION IS FOR HIDING THE MODAL
-    hideDeleteListModal() {
+    hideDeleteListModal = () => {
         let modal = document.getElementById("delete-list-modal");
         modal.classList.remove("is-visible");
+        this.setStateWithUpdatedModalOpen(false);
     }
-    showDeleteSongModal() {
+    showDeleteSongModal = () => {
         let modal = document.getElementById("delete-song-modal");
         modal.classList.add("is-visible");
+        this.setStateWithUpdatedModalOpen(true);
     }
     // THIS FUNCTION IS FOR HIDING THE MODAL
-    hideDeleteSongModal() {
+    hideDeleteSongModal = () => {
         let modal = document.getElementById("delete-song-modal");
         modal.classList.remove("is-visible");
+        this.setStateWithUpdatedModalOpen(false);
     }
-    showEditSongModal() {
+    showEditSongModal = () => {
         let modal = document.getElementById("edit-song-modal");
         modal.classList.add("is-visible");
+        this.setStateWithUpdatedModalOpen(true);
     }
     // THIS FUNCTION IS FOR HIDING THE MODAL
-    hideEditSongModal() {
+    hideEditSongModal = () => {
         let modal = document.getElementById("edit-song-modal");
         modal.classList.remove("is-visible");
+        this.setStateWithUpdatedModalOpen(false);
     }
 
-    testFunction = function(){
-        console.log("test function");
-        for (var i=0; i<arguments.length; i++)
-            console.log(arguments[i]);
-    }
 
 
 
     render() {
         this.addReDoAndUnDoShortCut();
 
-        let canAddSong = this.state.currentList !== null;
-        let canUndo = this.tps.hasTransactionToUndo();
-        let canRedo = this.tps.hasTransactionToRedo();
-        let canClose = this.state.currentList !== null;
-        let canAddList = this.state.currentList == null;
+        console.log(this.state.modalOpen);
+
+        if (this.state.modalOpen){
+            var canAddSong = false;
+            var canUndo = false;
+            var canRedo = false;
+            var canClose = false;
+            var canAddList = false;
+        }else{
+            var canAddSong = this.state.currentList !== null;
+            var canUndo = this.tps.hasTransactionToUndo();
+            var canRedo = this.tps.hasTransactionToRedo();
+            var canClose = this.state.currentList !== null;
+            var canAddList = this.state.currentList == null;
+        }
 
 
 

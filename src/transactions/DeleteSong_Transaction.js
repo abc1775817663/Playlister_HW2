@@ -6,6 +6,7 @@ export default class DeleteSong_Transaction extends jsTPS_Transaction {
         this.num = num;
         this.app = initApp;
         this.songInfo = null;
+        this.showModal = true;
 
 
     }
@@ -14,8 +15,13 @@ export default class DeleteSong_Transaction extends jsTPS_Transaction {
         if (!this.songInfo){
             this.songInfo = this.app.state.currentList.songs[this.num-1];
         }
-
-        this.app.markSongForDeletion(this.num);
+        if (this.showModal){
+            this.app.markSongForDeletion(this.num);
+        }
+        else{
+            this.app.deleteSongWithIndex(this.num-1);
+        }
+        this.showModal = false;
         
     }
     
